@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/pages/shared/box_text_field.dart';
 import 'package:quitanda_udemy/src/config/app_data.dart' as appdata;
 
@@ -136,9 +137,7 @@ class _ProfileTabState extends State<ProfileTab> {
                 top: 5,
                 right: 5,
                 child: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Get.back(),
                   icon: const Icon(Icons.close),
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/config/custom_colors.dart';
 import 'package:quitanda_udemy/src/models/cart_item_model.dart';
 import 'package:quitanda_udemy/src/pages/cart/components/box_cart_tile.dart';
@@ -125,10 +126,7 @@ class _CartTabState extends State<CartTab> {
                     },
                     child: const Text(
                       'Concluir pedido',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
@@ -152,9 +150,7 @@ class _CartTabState extends State<CartTab> {
           content: const Text('Deseja realmente concluir o pedido?'),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
+              onPressed: () => Get.back(result: false),
               child: const Text('Não'),
             ),
             ElevatedButton(
@@ -163,9 +159,7 @@ class _CartTabState extends State<CartTab> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
+              onPressed: () => Get.back(result: true),
               child: const Text('Sim'),
             ),
           ],

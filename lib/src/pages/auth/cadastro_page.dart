@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:quitanda_udemy/src/pages/shared/box_text_field.dart';
 import 'package:quitanda_udemy/src/config/custom_colors.dart';
@@ -84,10 +85,7 @@ class CadastroPage extends StatelessWidget {
                             onPressed: () {},
                             child: const Text(
                               'Cadastrar usuário',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
+                              style: TextStyle(fontSize: 18),
                             ),
                           ),
                         ),
@@ -101,9 +99,7 @@ class CadastroPage extends StatelessWidget {
                 left: 10,
                 child: SafeArea(
                   child: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
+                    onPressed: () => Get.back(),
                     icon: const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,

@@ -11,7 +11,7 @@ abstract class Pages {
       name: Routes.productRoute,
     ),
     GetPage(
-      page: () => const LoginPage(),
+      page: () => LoginPage(),
       name: Routes.loginRoute,
     ),
     GetPage(

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/config/pages_routes.dart';
+import 'package:quitanda_udemy/src/pages/auth/controller/auth_controller.dart';
 
 void main() {
+  Get.put(AuthController());
+
   runApp(const MyApp());
 }
 
@@ -23,6 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         elevatedButtonTheme: const ElevatedButtonThemeData(
           style: ButtonStyle(
+            foregroundColor: MaterialStatePropertyAll(Colors.white),
             backgroundColor: MaterialStatePropertyAll(Colors.green),
           ),
         ),

@@ -111,15 +111,9 @@ class _ProductPageState extends State<ProductPage> {
                           label: const Text(
                             'Add no carrinho',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          icon: const Icon(
-                            Icons.shopping_cart_outlined,
-                            color: Colors.white,
-                          ),
+                          icon: const Icon(Icons.shopping_cart_outlined),
                         ),
                       ),
                     ],
@@ -133,7 +127,7 @@ class _ProductPageState extends State<ProductPage> {
             top: 10,
             child: SafeArea(
               child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Get.back(),
                 icon: const Icon(
                   Icons.arrow_back_ios,
                 ),

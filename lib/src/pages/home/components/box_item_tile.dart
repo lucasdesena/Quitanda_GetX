@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/config/custom_colors.dart';
+import 'package:quitanda_udemy/src/config/pages_routes.dart';
 import 'package:quitanda_udemy/src/models/item_model.dart';
-import 'package:quitanda_udemy/src/pages/product/product_page.dart';
 import 'package:quitanda_udemy/src/services/utils_services.dart';
 
 class BoxItemTile extends StatefulWidget {
@@ -36,14 +37,7 @@ class _BoxItemTileState extends State<BoxItemTile> {
     return Stack(
       children: [
         GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductPage(),
-              ),
-            );
-          },
+          onTap: () => Get.toNamed(Routes.productRoute, arguments: widget.item),
           child: Card(
             elevation: 1,
             shadowColor: Colors.grey.shade300,

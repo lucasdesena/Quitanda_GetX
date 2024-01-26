@@ -1,13 +1,18 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/config/pages_routes.dart';
+import 'package:quitanda_udemy/src/pages/auth/controller/auth_controller.dart';
 import 'package:quitanda_udemy/src/pages/shared/box_text_field.dart';
 import 'package:quitanda_udemy/src/config/custom_colors.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+
+  final _formKey = GlobalKey<FormState>();
+
+  final emailController = TextEditingController();
+  final senhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,84 +84,123 @@ class LoginPage extends StatelessWidget {
                     top: Radius.circular(45),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const BoxTextField(
-                      icon: Icons.email,
-                      label: 'Email',
-                    ),
-                    const BoxTextField(
-                      icon: Icons.lock,
-                      label: 'Senha',
-                      isSenha: true,
-                    ),
-                    SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.offNamed(Routes.baseRoute);
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      BoxTextField(
+                        controller: emailController,
+                        icon: Icons.email,
+                        label: 'Email',
+                        validator: (email) {
+                          if (email == null || email.isEmpty) {
+                            return 'Digite seu email!';
+                          }
+
+                          if (!email.isEmail) {
+                            return 'Digite um email válido!';
+                          }
+
+                          return null;
                         },
-                        child: const Text(
-                          'Entrar',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
+                      ),
+                      BoxTextField(
+                        controller: senhaController,
+                        icon: Icons.lock,
+                        label: 'Senha',
+                        isSenha: true,
+                        validator: (senha) {
+                          if (senha == null || senha.isEmpty) {
+                            return 'Digite sua senha!';
+                          }
+
+                          if (senha.length < 7) {
+                            return 'Digite uma senha com pelo menos 7 caracters.';
+                          }
+
+                          return null;
+                        },
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: GetX<AuthController>(
+                          builder: (authController) {
+                            return ElevatedButton(
+                              onPressed: authController.isLoading.value
+                                  ? null
+                                  : () {
+                                      if (_formKey.currentState!.validate()) {
+                                        String email = emailController.text;
+                                        String senha = senhaController.text;
+
+                                        authController.login(
+                                          email: email,
+                                          senha: senha,
+                                        );
+                                        // Get.offNamed(Routes.baseRoute);
+                                      }
+                                    },
+                              child: authController.isLoading.value
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
+                                      'Entrar',
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                            );
+                          },
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Esqueceu a senha?',
-                          style: TextStyle(
-                            color: CustomColors.customContrastColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              color: Colors.grey.withAlpha(90),
-                              thickness: 2,
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Esqueceu a senha?',
+                            style: TextStyle(
+                              color: CustomColors.customContrastColor,
                             ),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: Text('Ou'),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              color: Colors.grey.withAlpha(90),
-                              thickness: 2,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey.withAlpha(90),
+                                thickness: 2,
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: Text('Ou'),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey.withAlpha(90),
+                                thickness: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              width: 2,
+                              color: Colors.green,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 50,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            width: 2,
-                            color: Colors.green,
-                          ),
+                          onPressed: () => Get.toNamed(Routes.cadastroRoute),
+                          child: const Text('Criar conta'),
                         ),
-                        onPressed: () {
-                          Get.toNamed(Routes.cadastroRoute);
-                        },
-                        child: const Text('Criar conta'),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],

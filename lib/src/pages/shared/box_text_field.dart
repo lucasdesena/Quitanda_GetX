@@ -10,6 +10,8 @@ class BoxTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? initialValue;
   final bool readOnly;
+  final String? Function(String?)? validator;
+  final TextEditingController? controller;
 
   const BoxTextField({
     Key? key,
@@ -19,6 +21,8 @@ class BoxTextField extends StatefulWidget {
     this.inputFormatters,
     this.initialValue,
     this.readOnly = false,
+    this.validator,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -41,11 +45,13 @@ class _BoxTextFieldState extends State<BoxTextField> {
       padding: const EdgeInsets.only(bottom: 15),
       child: TextFormField(
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+        autocorrect: false,
+        controller: widget.controller,
         readOnly: widget.readOnly,
         initialValue: widget.initialValue,
         inputFormatters: widget.inputFormatters,
-        autocorrect: false,
         obscureText: isObscure,
+        validator: widget.validator,
         decoration: InputDecoration(
           prefixIcon: Padding(
             padding: const EdgeInsets.only(right: 14, left: 14),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quitanda_udemy/src/models/order_model.dart';
 import 'package:quitanda_udemy/src/services/utils_services.dart';
@@ -84,9 +85,7 @@ class BoxPaymentDialog extends StatelessWidget {
             top: 0,
             right: 0,
             child: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Get.back(),
               icon: const Icon(Icons.close),
             ),
           ),
