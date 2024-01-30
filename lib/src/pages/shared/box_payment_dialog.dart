@@ -1,6 +1,5 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quitanda_udemy/src/models/order_model.dart';
 import 'package:quitanda_udemy/src/services/utils_services.dart';
 
@@ -38,10 +37,10 @@ class BoxPaymentDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                QrImageView(
-                  data: "asd654as65da4s6d5a4s6d54",
-                  version: QrVersions.auto,
-                  size: 200.0,
+                Image.memory(
+                  utilsServices.decodeQrCodeImage(order.qrCodeImage),
+                  height: 200,
+                  width: 200,
                 ),
                 Text(
                   'Vencimento: ${utilsServices.formatDateTime(order.overdueDateTime)}',
@@ -66,7 +65,10 @@ class BoxPaymentDialog extends StatelessWidget {
                       color: Colors.green,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    FlutterClipboard.copy(order.copyAndPaste);
+                    utilsServices.showToast(message: 'Código copiado');
+                  },
                   icon: const Icon(
                     Icons.copy,
                     size: 15,
@@ -85,7 +87,9 @@ class BoxPaymentDialog extends StatelessWidget {
             top: 0,
             right: 0,
             child: IconButton(
-              onPressed: () => Get.back(),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
               icon: const Icon(Icons.close),
             ),
           ),

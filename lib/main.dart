@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/config/pages_routes.dart';
 import 'package:quitanda_udemy/src/pages/auth/controller/auth_controller.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   Get.put(AuthController());
 
-  runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -18,9 +25,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Quitanda',
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-      ],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const <Locale>[Locale('pt', 'BR')],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
@@ -34,10 +39,11 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
         ),
+        dialogTheme: const DialogTheme(surfaceTintColor: Colors.transparent),
         useMaterial3: true,
       ),
       getPages: Pages.pages,
-      initialRoute: Routes.loginRoute,
+      initialRoute: Routes.splashRoute,
     );
   }
 }

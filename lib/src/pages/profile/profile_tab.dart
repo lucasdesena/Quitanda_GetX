@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quitanda_udemy/src/pages/auth/controller/auth_controller.dart';
 import 'package:quitanda_udemy/src/pages/shared/box_text_field.dart';
-import 'package:quitanda_udemy/src/config/app_data.dart' as appdata;
+import 'package:quitanda_udemy/src/services/validators.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({Key? key}) : super(key: key);
@@ -11,6 +12,8 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
+  final authController = Get.find<AuthController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +21,9 @@ class _ProfileTabState extends State<ProfileTab> {
         title: const Text('Perfil do usuário'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              authController.logout();
+            },
             icon: const Icon(
               Icons.logout,
             ),
@@ -31,29 +36,31 @@ class _ProfileTabState extends State<ProfileTab> {
         children: [
           BoxTextField(
             readOnly: true,
-            initialValue: appdata.user.email,
+            initialValue: authController.user.email,
             icon: Icons.email,
             label: 'Email',
           ),
           BoxTextField(
             readOnly: true,
-            initialValue: appdata.user.name,
+            initialValue: authController.user.name,
             icon: Icons.person,
             label: 'Nome',
           ),
           BoxTextField(
             readOnly: true,
-            initialValue: appdata.user.phone,
+            initialValue: authController.user.phone,
             icon: Icons.phone,
             label: 'Celular',
           ),
           BoxTextField(
             readOnly: true,
-            initialValue: appdata.user.cpf,
+            initialValue: authController.user.cpf,
             icon: Icons.file_copy,
             label: 'CPF',
             isSenha: true,
           ),
+
+          // Botão para atualizar a senha
           SizedBox(
             height: 50,
             child: OutlinedButton(
@@ -77,6 +84,10 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   Future<bool?> updatePassword() {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -88,56 +99,100 @@ class _ProfileTabState extends State<ProfileTab> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text(
-                        'Atualização de senha',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const BoxTextField(
-                      isSenha: true,
-                      icon: Icons.lock,
-                      label: 'Senha atual',
-                    ),
-                    const BoxTextField(
-                      isSenha: true,
-                      icon: Icons.lock_outline,
-                      label: 'Nova senha',
-                    ),
-                    const BoxTextField(
-                      isSenha: true,
-                      icon: Icons.lock_outline,
-                      label: 'Confirmar nova senha',
-                    ),
-                    SizedBox(
-                      height: 45,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Titulo
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'Atualização de senha',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onPressed: () {},
-                        child: const Text('Atualizar'),
                       ),
-                    ),
-                  ],
+
+                      // Senha atual
+                      BoxTextField(
+                        controller: currentPasswordController,
+                        isSenha: true,
+                        icon: Icons.lock,
+                        label: 'Senha atual',
+                        validator: passwordValidator,
+                      ),
+
+                      // Nova senha
+                      BoxTextField(
+                        controller: newPasswordController,
+                        isSenha: true,
+                        icon: Icons.lock_outline,
+                        label: 'Nova senha',
+                        validator: passwordValidator,
+                      ),
+
+                      // Confirmação nova senha
+                      BoxTextField(
+                        isSenha: true,
+                        icon: Icons.lock_outline,
+                        label: 'Confirmar nova senha',
+                        validator: (password) {
+                          final result = passwordValidator(password);
+
+                          if (result != null) {
+                            return result;
+                          }
+
+                          if (password != newPasswordController.text) {
+                            return 'As senhas não são equivalentes';
+                          }
+
+                          return null;
+                        },
+                      ),
+
+                      // Botão de confirmação
+                      SizedBox(
+                        height: 45,
+                        child: Obx(() => ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              onPressed: authController.isLoading.value
+                                  ? null
+                                  : () {
+                                      if (formKey.currentState!.validate()) {
+                                        authController.changePassword(
+                                          currentPassword:
+                                              currentPasswordController.text,
+                                          newPassword:
+                                              newPasswordController.text,
+                                        );
+                                      }
+                                    },
+                              child: authController.isLoading.value
+                                  ? const CircularProgressIndicator()
+                                  : const Text('Atualizar'),
+                            )),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Positioned(
                 top: 5,
                 right: 5,
                 child: IconButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                   icon: const Icon(Icons.close),
                 ),
               ),

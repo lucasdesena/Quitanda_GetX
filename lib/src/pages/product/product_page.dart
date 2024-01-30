@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/config/custom_colors.dart';
 import 'package:quitanda_udemy/src/models/item_model.dart';
+import 'package:quitanda_udemy/src/pages/base/controller/navigation_controller.dart';
+import 'package:quitanda_udemy/src/pages/cart/controller/cart_controller.dart';
 import 'package:quitanda_udemy/src/pages/shared/box_quantity.dart';
 import 'package:quitanda_udemy/src/services/utils_services.dart';
 
@@ -22,6 +23,9 @@ class _ProductPageState extends State<ProductPage> {
 
   int cartItemQuantity = 1;
 
+  final cartController = Get.find<CartController>();
+  final navigationController = Get.find<NavigationController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +37,7 @@ class _ProductPageState extends State<ProductPage> {
               Expanded(
                 child: Hero(
                   tag: widget.item.imgUrl,
-                  child: Image.asset(widget.item.imgUrl),
+                  child: Image.network(widget.item.imgUrl),
                 ),
               ),
               Expanded(
@@ -107,13 +111,27 @@ class _ProductPageState extends State<ProductPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.back();
+
+                            cartController.addItemToCart(
+                              item: widget.item,
+                              quantity: cartItemQuantity,
+                            );
+                            navigationController
+                                .navigatePageView(NavigationTabs.cart);
+                          },
                           label: const Text(
                             'Add no carrinho',
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          icon: const Icon(Icons.shopping_cart_outlined),
+                          icon: const Icon(
+                            Icons.shopping_cart_outlined,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
@@ -127,7 +145,7 @@ class _ProductPageState extends State<ProductPage> {
             top: 10,
             child: SafeArea(
               child: IconButton(
-                onPressed: () => Get.back(),
+                onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(
                   Icons.arrow_back_ios,
                 ),
