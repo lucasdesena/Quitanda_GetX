@@ -19,7 +19,6 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   GlobalKey<CartIconKey> globalKeyCartItems = GlobalKey<CartIconKey>();
-  // late int _cartQuantityItems;
 
   final searchController = TextEditingController();
   final navigationController = Get.find<NavigationController>();
@@ -29,9 +28,9 @@ class _HomeTabState extends State<HomeTab> {
 
   void itemSelectedCartAnimations(GlobalKey gkImage) async {
     runAddToCardAnimation(gkImage);
-    await globalKeyCartItems.currentState!.runCartAnimation().then(
+    await globalKeyCartItems.currentState?.runCartAnimation().then(
       (_) async {
-        await globalKeyCartItems.currentState!.updateBadge(
+        await globalKeyCartItems.currentState?.updateBadge(
           (cartController.cartItems.length).toString(),
         );
       },
@@ -42,7 +41,7 @@ class _HomeTabState extends State<HomeTab> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (cartController.cartItems.isEmpty) await cartController.getCartItems();
-      await globalKeyCartItems.currentState!.updateBadge(
+      await globalKeyCartItems.currentState?.updateBadge(
         (cartController.cartItems.length).toString(),
       );
     });
