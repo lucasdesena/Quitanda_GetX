@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:quitanda_udemy/src/constants/endpoints.dart';
 import 'package:quitanda_udemy/src/models/category_model.dart';
 import 'package:quitanda_udemy/src/models/item_model.dart';
@@ -26,12 +27,13 @@ class HomeRespository {
     }
   }
 
-  Future<HomeResult<ItemModel>> getAllProducts(
-      Map<String, dynamic> body) async {
+  Future<HomeResult<ItemModel>> getAllProducts(Map<String, dynamic> body,
+      {CancelToken? cancelToken}) async {
     final result = await _httpManager.restRequest(
       url: Endpoints.getAllProducts,
       method: HttpMethods.post,
       body: body,
+      cancelToken: cancelToken,
     );
 
     if (result['result'] != null) {
