@@ -40,7 +40,6 @@ class MyApp extends StatelessWidget {
           surfaceTintColor: Colors.transparent,
         ),
         dialogTheme: const DialogTheme(surfaceTintColor: Colors.transparent),
-        useMaterial3: true,
       ),
       getPages: Pages.pages,
       initialRoute: Routes.splashRoute,
