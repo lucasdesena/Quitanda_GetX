@@ -14,16 +14,27 @@ class OrdersTab extends StatelessWidget {
       ),
       body: GetBuilder<AllOrdersController>(
         builder: (controller) {
-          return RefreshIndicator(
-            onRefresh: () => controller.getAllOrders(),
-            child: ListView.separated(
-              padding: const EdgeInsets.all(16),
-              separatorBuilder: (_, index) => const SizedBox(height: 10),
-              itemBuilder: (_, index) =>
-                  BoxOrderTile(order: controller.allOrders[index]),
-              itemCount: controller.allOrders.length,
-            ),
-          );
+          return controller.allOrders.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                          'assets/app_images/histórico-de-compras-vazio.png'),
+                      const Text('Não há nenhum pedido'),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: () => controller.getAllOrders(),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    separatorBuilder: (_, index) => const SizedBox(height: 10),
+                    itemBuilder: (_, index) =>
+                        BoxOrderTile(order: controller.allOrders[index]),
+                    itemCount: controller.allOrders.length,
+                  ),
+                );
         },
       ),
     );

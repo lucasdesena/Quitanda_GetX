@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Map<int, Color> _swatchOpacity = {
-  50: const Color.fromRGBO(139, 195, 74, .1),
+  50: const Color.fromRGBO(139, 195, 74, 0.094),
   100: const Color.fromRGBO(139, 195, 74, .2),
   200: const Color.fromRGBO(139, 195, 74, .3),
   300: const Color.fromRGBO(139, 195, 74, .4),
@@ -12,6 +12,12 @@ Map<int, Color> _swatchOpacity = {
   800: const Color.fromRGBO(139, 195, 74, .9),
   900: const Color.fromRGBO(139, 195, 74, 1),
 };
+
+///Cores para imagens
+///Cor primária: 8BC34A
+///Cor mais escura: 396E47
+///Cor mais clara: F1FFDC
+///Cor de contraste: D32F2F
 
 abstract class CustomColors {
   static Color customContrastColor = Colors.red.shade700;
