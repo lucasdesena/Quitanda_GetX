@@ -8,7 +8,9 @@ import 'package:quitanda_udemy/src/services/http_manager.dart';
 class HomeRespository {
   final HttpManager _httpManager = HttpManager();
 
-  Future<HomeResult<CategoryModel>> getAllCategories() async {
+  // Utilizando o tipo Record para aprendizado
+  Future<({List<CategoryModel>? categories, String? errorMessage})>
+      getAllCategories() async {
     final result = await _httpManager.restRequest(
       url: Endpoints.getAllCategories,
       method: HttpMethods.post,
@@ -20,10 +22,14 @@ class HomeRespository {
               .map(CategoryModel.fromJson)
               .toList();
 
-      return HomeResult<CategoryModel>.success(data);
+      // No caso de sucesso retornamos a lista de categorias e passamos um valor nulo na mensagem de erro.
+      return (categories: data, errorMessage: null);
     } else {
-      return HomeResult.error(
-          'Ocorreu um erro inesperado ao recuperar as categorias');
+      // Em caso de erro passamos um valor nulo na lista e uma mensagem de erro
+      return (
+        categories: null,
+        errorMessage: 'Ocorreu um erro inesperado ao recuperar as categorias'
+      );
     }
   }
 

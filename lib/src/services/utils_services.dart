@@ -61,7 +61,7 @@ class UtilsServices {
       ),
       icon: isError
           ? const Icon(
-              Icons.cancel_outlined,
+              Icons.cancel_rounded,
               color: Colors.red,
             )
           : const Icon(

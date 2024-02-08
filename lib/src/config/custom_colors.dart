@@ -13,11 +13,11 @@ Map<int, Color> _swatchOpacity = {
   900: const Color.fromRGBO(139, 195, 74, 1),
 };
 
-///Cores para imagens
-///Cor primária: 8BC34A
-///Cor mais escura: 396E47
-///Cor mais clara: F1FFDC
-///Cor de contraste: D32F2F
+// Cores para imagens:
+// Cor primária: 8BC34A
+// Cor mais escura: 396E47
+// Cor mais clara: F1FFDC
+// Cor de contraste: D32F2F
 
 abstract class CustomColors {
   static Color customContrastColor = Colors.red.shade700;

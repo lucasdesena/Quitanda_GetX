@@ -11,9 +11,11 @@ abstract class NavigationTabs {
 class NavigationController extends GetxController {
   late PageController _pageController;
   late RxInt _currentIndex;
+  final RxBool _animationFinished = true.obs;
 
   PageController get pageController => _pageController;
   int get currentIndex => _currentIndex.value;
+  bool get animationFinished => _animationFinished.value;
 
   @override
   void onInit() {
@@ -23,6 +25,10 @@ class NavigationController extends GetxController {
       pageController: PageController(initialPage: NavigationTabs.home),
       currentIndex: NavigationTabs.home,
     );
+  }
+
+  setAnimationValue(bool newValue) {
+    _animationFinished.value = newValue;
   }
 
   void _initNavigation({
@@ -35,8 +41,16 @@ class NavigationController extends GetxController {
 
   void navigatePageView(int page) {
     if (_currentIndex.value == page) return;
-
-    _pageController.jumpToPage(page);
-    _currentIndex.value = page;
+    //Checa se está na home pois só nela existe a animação
+    if (_currentIndex.value == 0) {
+      //Checa se a animação acabou de ser executada
+      if (_animationFinished.value) {
+        _pageController.jumpToPage(page);
+        _currentIndex.value = page;
+      }
+    } else {
+      _pageController.jumpToPage(page);
+      _currentIndex.value = page;
+    }
   }
 }

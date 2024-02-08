@@ -62,29 +62,31 @@ class HomeController extends GetxController {
     await getAllProducts();
   }
 
+  // Utilizando o tipo Record para aprendizado
   Future<void> getAllCategories() async {
     setLoading(true);
 
-    HomeResult<CategoryModel> homeResult =
+    // Aqui recuperamos os valores e fazermos da desestruturação do Record recebido
+    final (:categories, :errorMessage) =
         await homeRespository.getAllCategories();
 
     setLoading(false);
 
-    homeResult.when(
-      success: (data) {
-        allCategories.assignAll(data);
+    // Aqui verifico se a lista de categorias é nula. Se não for recuperamos a listagem
+    if (categories != null) {
+      allCategories.assignAll(categories);
 
-        if (allCategories.isEmpty) return;
+      if (allCategories.isEmpty) return;
 
-        selectCategory(allCategories.first);
-      },
-      error: (message) {
-        utilsServices.showToast(
-          message: message,
-          isError: true,
-        );
-      },
-    );
+      selectCategory(allCategories.first);
+
+      // Se a lista de categorias for nula, sabemos que houve um problema e então apresentamos a mensagem de erro.
+    } else {
+      utilsServices.showToast(
+        message: errorMessage!,
+        isError: true,
+      );
+    }
   }
 
   void filterByTitle() {

@@ -27,14 +27,14 @@ class _HomeTabState extends State<HomeTab> {
   late Function(GlobalKey) runAddToCardAnimation;
 
   void itemSelectedCartAnimations(GlobalKey gkImage) async {
+    navigationController.setAnimationValue(false);
     runAddToCardAnimation(gkImage);
-    await globalKeyCartItems.currentState?.runCartAnimation().then(
-      (_) async {
-        await globalKeyCartItems.currentState?.updateBadge(
-          (cartController.cartItems.length).toString(),
-        );
-      },
-    );
+    await globalKeyCartItems.currentState
+        ?.runCartAnimation(cartController.cartItems.length.toString());
+
+    // Delay para permitir acabar a animação pois os métodos whenComplete e then não estão funcionando como esperado
+    await Future.delayed(const Duration(milliseconds: 1500));
+    navigationController.setAnimationValue(true);
   }
 
   @override
@@ -42,7 +42,7 @@ class _HomeTabState extends State<HomeTab> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (cartController.cartItems.isEmpty) await cartController.getCartItems();
       await globalKeyCartItems.currentState?.updateBadge(
-        (cartController.cartItems.length).toString(),
+        cartController.cartItems.length.toString(),
       );
     });
     super.initState();
@@ -75,8 +75,10 @@ class _HomeTabState extends State<HomeTab> {
                 builder: (controller) {
                   return GestureDetector(
                     onTap: () {
-                      navigationController
-                          .navigatePageView(NavigationTabs.cart);
+                      if (navigationController.animationFinished) {
+                        navigationController
+                            .navigatePageView(NavigationTabs.cart);
+                      }
                     },
                     child: AddToCartIcon(
                       key: globalKeyCartItems,
