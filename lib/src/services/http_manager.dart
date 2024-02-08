@@ -14,6 +14,7 @@ class HttpManager {
     required String method,
     Map? headers,
     Map? body,
+    CancelToken? cancelToken,
   }) async {
     // Headers da requisição
     final defaultHeaders = headers?.cast<String, String>() ?? {}
@@ -34,6 +35,7 @@ class HttpManager {
           method: method,
         ),
         data: body,
+        cancelToken: cancelToken,
       );
 
       // Retorno do resultado do backend

@@ -27,14 +27,14 @@ class _HomeTabState extends State<HomeTab> {
   late Function(GlobalKey) runAddToCardAnimation;
 
   void itemSelectedCartAnimations(GlobalKey gkImage) async {
+    navigationController.setAnimationValue(false);
     runAddToCardAnimation(gkImage);
-    await globalKeyCartItems.currentState?.runCartAnimation().then(
-      (_) async {
-        await globalKeyCartItems.currentState?.updateBadge(
-          (cartController.cartItems.length).toString(),
-        );
-      },
-    );
+    await globalKeyCartItems.currentState
+        ?.runCartAnimation(cartController.cartItems.length.toString());
+
+    // Delay para permitir acabar a animação pois os métodos whenComplete e then não estão funcionando como esperado
+    await Future.delayed(const Duration(milliseconds: 1500));
+    navigationController.setAnimationValue(true);
   }
 
   @override
@@ -42,7 +42,7 @@ class _HomeTabState extends State<HomeTab> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (cartController.cartItems.isEmpty) await cartController.getCartItems();
       await globalKeyCartItems.currentState?.updateBadge(
-        (cartController.cartItems.length).toString(),
+        cartController.cartItems.length.toString(),
       );
     });
     super.initState();
@@ -50,56 +50,59 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        title: const BoxAppName(),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 15,
-              right: 30,
-            ),
-            child: GetBuilder<CartController>(
-              builder: (controller) {
-                return GestureDetector(
-                  onTap: () {
-                    navigationController.navigatePageView(NavigationTabs.cart);
-                  },
-                  child: AddToCartIcon(
-                    key: globalKeyCartItems,
-                    icon: Icon(
-                      size: 25,
-                      Icons.shopping_cart,
-                      color: CustomColors.customSwatchColor,
-                    ),
-                    badgeOptions: BadgeOptions(
-                      active: true,
-                      fontSize: 12,
-                      height: 20,
-                      width: 20,
-                      foregroundColor: Colors.white,
-                      backgroundColor: CustomColors.customContrastColor,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+    return AddToCartAnimation(
+      cartKey: globalKeyCartItems,
+      jumpAnimation: const JumpAnimationOptions(
+        duration: Duration(milliseconds: 100),
+        curve: Curves.ease,
       ),
-      body: AddToCartAnimation(
-        cartKey: globalKeyCartItems,
-        jumpAnimation: const JumpAnimationOptions(
-          duration: Duration(milliseconds: 100),
-          curve: Curves.ease,
+      createAddToCartAnimation: (addToCardAnimationMethod) {
+        runAddToCardAnimation = addToCardAnimationMethod;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          title: const BoxAppName(),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 15,
+                right: 30,
+              ),
+              child: GetBuilder<CartController>(
+                builder: (controller) {
+                  return GestureDetector(
+                    onTap: () {
+                      if (navigationController.animationFinished) {
+                        navigationController
+                            .navigatePageView(NavigationTabs.cart);
+                      }
+                    },
+                    child: AddToCartIcon(
+                      key: globalKeyCartItems,
+                      icon: Icon(
+                        size: 25,
+                        Icons.shopping_cart,
+                        color: CustomColors.customSwatchColor,
+                      ),
+                      badgeOptions: BadgeOptions(
+                        active: true,
+                        fontSize: 12,
+                        height: 20,
+                        width: 20,
+                        foregroundColor: Colors.white,
+                        backgroundColor: CustomColors.customContrastColor,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-        createAddToCartAnimation: (addToCardAnimationMethod) {
-          runAddToCardAnimation = addToCardAnimationMethod;
-        },
-        child: Column(
+        body: Column(
           children: [
             GetBuilder<HomeController>(
               builder: (controller) {
@@ -144,7 +147,7 @@ class _HomeTabState extends State<HomeTab> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(60),
                         borderSide: const BorderSide(
-                          width: 0,
+                          width: 1,
                           style: BorderStyle.none,
                         ),
                       ),
@@ -163,8 +166,8 @@ class _HomeTabState extends State<HomeTab> {
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (_, index) {
                             return BoxCategoryTile(
-                              onPressed: () {
-                                controller.selectCategory(
+                              onPressed: () async {
+                                await controller.selectCategory(
                                     controller.allCategories[index]);
                               },
                               category: controller.allCategories[index].title,
@@ -212,29 +215,33 @@ class _HomeTabState extends State<HomeTab> {
                               const Text('Não há itens para apresentar'),
                             ],
                           ),
-                          child: GridView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            physics: const BouncingScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 10,
-                              childAspectRatio: 9 / 11.5,
-                            ),
-                            itemCount: controller.allProducts.length,
-                            itemBuilder: (_, index) {
-                              if (((index + 1) ==
-                                      controller.allProducts.length) &&
-                                  !controller.isLastPage) {
-                                controller.loadMoreProducts();
-                              }
+                          child: RefreshIndicator(
+                            onRefresh: controller.getAllCategories,
+                            child: GridView.builder(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                              physics: const BouncingScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 9 / 11.5,
+                              ),
+                              itemCount: controller.allProducts.length,
+                              itemBuilder: (_, index) {
+                                if (((index + 1) ==
+                                        controller.allProducts.length) &&
+                                    !controller.isLastPage) {
+                                  controller.loadMoreProducts();
+                                }
 
-                              return BoxItemTile(
-                                item: controller.allProducts[index],
-                                cartAnimationMethod: itemSelectedCartAnimations,
-                              );
-                            },
+                                return BoxItemTile(
+                                  item: controller.allProducts[index],
+                                  cartAnimationMethod:
+                                      itemSelectedCartAnimations,
+                                );
+                              },
+                            ),
                           ),
                         )
                       : GridView.count(

@@ -31,11 +31,8 @@ class _CartTabState extends State<CartTab> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.remove_shopping_cart,
-                        size: 40,
-                        color: CustomColors.customSwatchColor,
-                      ),
+                      Image.asset(
+                          'assets/app_images/carrinho-de-compras-vazio.png'),
                       const Text('Não há itens no carrinho'),
                     ],
                   );

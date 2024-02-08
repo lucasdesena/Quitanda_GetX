@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:quitanda_udemy/src/models/category_model.dart';
 import 'package:quitanda_udemy/src/models/item_model.dart';
@@ -19,6 +20,8 @@ class HomeController extends GetxController {
 
   RxString searchTitle = ''.obs;
 
+  CancelToken cancelToken = CancelToken();
+
   bool get isLastPage {
     if (currentCategory!.items.length < itemsPerPage) return true;
     return currentCategory!.pagination * itemsPerPage > allProducts.length;
@@ -34,7 +37,7 @@ class HomeController extends GetxController {
   }
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
 
     debounce(
@@ -43,41 +46,47 @@ class HomeController extends GetxController {
       time: const Duration(milliseconds: 600),
     );
 
-    getAllCategories();
+    await getAllCategories();
   }
 
-  void selectCategory(CategoryModel category) {
+  Future<void> selectCategory(CategoryModel category) async {
+    // Cancela a solicitação pendente antes de mudar para uma nova categoria
+    cancelToken.cancel();
+    cancelToken = CancelToken();
+
     currentCategory = category;
     update();
 
     if (currentCategory!.items.isNotEmpty) return;
 
-    getAllProducts();
+    await getAllProducts();
   }
 
+  // Utilizando o tipo Record para aprendizado
   Future<void> getAllCategories() async {
     setLoading(true);
 
-    HomeResult<CategoryModel> homeResult =
+    // Aqui recuperamos os valores e fazermos da desestruturação do Record recebido
+    final (:categories, :errorMessage) =
         await homeRespository.getAllCategories();
 
     setLoading(false);
 
-    homeResult.when(
-      success: (data) {
-        allCategories.assignAll(data);
+    // Aqui verifico se a lista de categorias é nula. Se não for recuperamos a listagem
+    if (categories != null) {
+      allCategories.assignAll(categories);
 
-        if (allCategories.isEmpty) return;
+      if (allCategories.isEmpty) return;
 
-        selectCategory(allCategories.first);
-      },
-      error: (message) {
-        utilsServices.showToast(
-          message: message,
-          isError: true,
-        );
-      },
-    );
+      selectCategory(allCategories.first);
+
+      // Se a lista de categorias for nula, sabemos que houve um problema e então apresentamos a mensagem de erro.
+    } else {
+      utilsServices.showToast(
+        message: errorMessage!,
+        isError: true,
+      );
+    }
   }
 
   void filterByTitle() {
@@ -115,10 +124,10 @@ class HomeController extends GetxController {
     getAllProducts();
   }
 
-  void loadMoreProducts() {
+  Future<void> loadMoreProducts() async {
     currentCategory!.pagination++;
 
-    getAllProducts(canLoad: false);
+    await getAllProducts(canLoad: false);
   }
 
   Future<void> getAllProducts({bool canLoad = true}) async {
@@ -140,7 +149,10 @@ class HomeController extends GetxController {
       }
     }
 
-    HomeResult<ItemModel> result = await homeRespository.getAllProducts(body);
+    HomeResult<ItemModel> result = await homeRespository.getAllProducts(
+      body,
+      cancelToken: cancelToken,
+    );
 
     setLoading(false, isProduct: true);
 
@@ -155,5 +167,12 @@ class HomeController extends GetxController {
         );
       },
     );
+  }
+
+  @override
+  void onClose() {
+    // Cancela a solicitação quando o controlador é fechado (por exemplo, quando a página é descartada)
+    cancelToken.cancel();
+    super.onClose();
   }
 }
